@@ -1,3 +1,11 @@
+//
+//  TodoItem.swift
+//  TaskCore
+//
+//  Created by James Trujillo on 5/2/25.
+//
+
+
 import Foundation
 
 struct TodoItem: Identifiable, Codable, Equatable {

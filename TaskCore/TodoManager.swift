@@ -1,3 +1,11 @@
+//
+//  TodoManager.swift
+//  TaskCore
+//
+//  Created by James Trujillo on 5/2/25.
+//
+
+
 import Foundation
 
 class TodoManager: ObservableObject {
