@@ -13,7 +13,7 @@ struct RandomNumberTabView: View {
     @Binding var maxNumber: Int
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 30) {
                 // Number Display
                 ZStack {

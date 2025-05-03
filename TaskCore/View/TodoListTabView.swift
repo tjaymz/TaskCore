@@ -13,7 +13,7 @@ struct TodoListTabView: View {
     @Binding var newTodoTitle: String
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 // Add Todo Section
                 VStack(spacing: 15) {

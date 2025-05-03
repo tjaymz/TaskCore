@@ -15,7 +15,7 @@ struct TimerTabView: View {
     @Binding var timer: Timer?
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 30) {
                 // Timer Display
                 ZStack {
