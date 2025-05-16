@@ -36,7 +36,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         
         // Check if this is a CloudKit notification
-        if let notification = CKNotification(fromRemoteNotificationDictionary: userInfo) {
+        if CKNotification(fromRemoteNotificationDictionary: userInfo) != nil {
             NotificationCenter.default.post(name: .NSPersistentStoreRemoteChange, object: nil)
             completionHandler(.newData)
             return
