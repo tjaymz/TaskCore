@@ -5,25 +5,6 @@
 //  Created by James Trujillo on 5/2/25.
 //
 
-
-//import Foundation
-//
-//struct TodoItem: Identifiable, Codable, Equatable {
-//    let id: UUID
-//    var title: String
-//    var isCompleted: Bool
-//    
-//    init(id: UUID = UUID(), title: String, isCompleted: Bool = false) {
-//        self.id = id
-//        self.title = title
-//        self.isCompleted = isCompleted
-//    }
-//    
-//    static func == (lhs: TodoItem, rhs: TodoItem) -> Bool {
-//        lhs.id == rhs.id
-//    }
-//}
-
 import Foundation
 import CloudKit
 
@@ -32,7 +13,7 @@ struct TodoItem: Identifiable, Equatable {
     var title: String
     var isCompleted: Bool
     var recordID: CKRecord.ID? // For CloudKit syncing
-    var modificationDate: Date? // Track when the item was last modified
+    var modificationDate: Date? // Track when the item was last modified locally
     
     init(id: UUID = UUID(), title: String, isCompleted: Bool = false, recordID: CKRecord.ID? = nil, modificationDate: Date? = Date()) {
         self.id = id
@@ -42,33 +23,55 @@ struct TodoItem: Identifiable, Equatable {
         self.modificationDate = modificationDate
     }
     
-    // Convert TodoItem to CKRecord
+    // Convert TodoItem to CKRecord - FIXED to only use required fields
     func toCKRecord() -> CKRecord {
+        // If we have a recordID, use it, otherwise create a new one
         let recordID = self.recordID ?? CKRecord.ID(recordName: id.uuidString)
         let record = CKRecord(recordType: "TodoItem", recordID: recordID)
+        
+        // ONLY store these specific fields - no custom modificationDate
         record["title"] = title as CKRecordValue
         record["isCompleted"] = isCompleted as CKRecordValue
         record["id"] = id.uuidString as CKRecordValue
+        
+        // Let CloudKit handle modificationDate automatically
+        print("Creating CKRecord: type=TodoItem, id=\(id.uuidString), fields: title, isCompleted, id")
+        
         return record
     }
     
-    // Create TodoItem from CKRecord
+    // Create TodoItem from CKRecord - FIXED to use system modificationDate
     static func fromCKRecord(_ record: CKRecord) -> TodoItem? {
-        guard
-            let idString = record["id"] as? String,
-            let id = UUID(uuidString: idString),
-            let title = record["title"] as? String,
-            let isCompleted = record["isCompleted"] as? Bool
-        else {
+        // Validate record type
+        guard record.recordType == "TodoItem" else {
+            print("Record is not a TodoItem type: \(record.recordType)")
             return nil
         }
         
+        // Print available fields for debugging
+        print("Reading CKRecord: \(record.recordID.recordName), available fields: \(Array(record.allKeys()))")
+        
+        // Extract and validate required fields
+        guard let idString = record["id"] as? String,
+              let id = UUID(uuidString: idString),
+              let title = record["title"] as? String else {
+            print("Missing or invalid required fields in record")
+            return nil
+        }
+        
+        // Extract optional fields with default values
+        let isCompleted = record["isCompleted"] as? Bool ?? false
+        
+        // Use CloudKit's system modificationDate (this is always sortable)
+        let modificationDate = record.modificationDate
+        
+        // Create TodoItem with all data
         return TodoItem(
             id: id,
             title: title,
             isCompleted: isCompleted,
             recordID: record.recordID,
-            modificationDate: record.modificationDate
+            modificationDate: modificationDate
         )
     }
     
@@ -80,7 +83,7 @@ struct TodoItem: Identifiable, Equatable {
 // MARK: - Codable Implementation
 extension TodoItem: Codable {
     enum CodingKeys: String, CodingKey {
-        case id, title, isCompleted, recordIDName, zoneID, modificationDate
+        case id, title, isCompleted, recordIDName, modificationDate
     }
     
     init(from decoder: Decoder) throws {

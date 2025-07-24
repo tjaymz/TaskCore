@@ -5,7 +5,6 @@
 //  Created by James Trujillo on 5/10/25.
 //
 
-
 import Foundation
 import CloudKit
 import SwiftUI
@@ -24,48 +23,79 @@ class CloudKitManager: ObservableObject {
     private let subscriptionID = "TodoItemsChanges"
     
     init() {
-        // Get your container identifier from the one you created
-        container = CKContainer(identifier: "iCloud.com.2ndstartech.TaskCore") // Replace with your actual container ID
+        // Use the default container on both simulator and device
+        container = CKContainer.default()
         database = container.privateCloudDatabase
         
-        checkiCloudAccountStatus()
-        setupSubscription()
+        print("CloudKit: Initialized with default container")
     }
     
-    // Check if user is signed into iCloud
-    func checkiCloudAccountStatus() {
+    // Check if user is signed into iCloud with completion handler
+    func checkiCloudAccountStatus(completion: @escaping (Bool) -> Void) {
+        print("CloudKit: Checking iCloud account status")
         container.accountStatus { [weak self] status, error in
             DispatchQueue.main.async {
+                if let error = error {
+                    print("CloudKit: Account status error: \(error.localizedDescription)")
+                    self?.error = error.localizedDescription
+                    completion(false)
+                    return
+                }
+                
+                let isAvailable: Bool
+                let errorMessage: String?
+                
                 switch status {
                 case .available:
-                    self?.isSignedInToiCloud = true
-                    self?.error = nil
+                    print("CloudKit: iCloud account is available")
+                    isAvailable = true
+                    errorMessage = nil
                 case .restricted:
-                    self?.isSignedInToiCloud = false
-                    self?.error = "iCloud access is restricted. Check your device settings."
+                    print("CloudKit: iCloud account is restricted")
+                    isAvailable = false
+                    errorMessage = "iCloud access is restricted"
                 case .noAccount:
-                    self?.isSignedInToiCloud = false
-                    self?.error = "No iCloud account found. Please sign in to iCloud to enable syncing."
+                    print("CloudKit: No iCloud account found")
+                    isAvailable = false
+                    errorMessage = "Please sign in to iCloud in Settings"
                 case .couldNotDetermine:
-                    self?.isSignedInToiCloud = false
-                    self?.error = "Could not determine iCloud account status. Please check your network connection."
+                    print("CloudKit: Could not determine iCloud account status")
+                    isAvailable = false
+                    errorMessage = "Cannot determine iCloud status"
                 case .temporarilyUnavailable:
-                    self?.isSignedInToiCloud = false
-                    self?.error = "iCloud is temporarily unavailable. Please try again later."
+                    print("CloudKit: iCloud is temporarily unavailable")
+                    isAvailable = false
+                    errorMessage = "iCloud temporarily unavailable"
                 @unknown default:
-                    self?.isSignedInToiCloud = false
-                    self?.error = "Unknown iCloud account status."
+                    print("CloudKit: Unknown iCloud account status")
+                    isAvailable = false
+                    errorMessage = "Unknown iCloud status"
                 }
+                
+                self?.isSignedInToiCloud = isAvailable
+                self?.error = errorMessage
+                completion(isAvailable)
             }
         }
     }
     
+    // Check if user is signed into iCloud (synchronous version for compatibility)
+    func checkiCloudAccountStatus() {
+        checkiCloudAccountStatus { _ in }
+    }
+    
     // Setup subscription for changes
     func setupSubscription() {
-        let predicate = NSPredicate(value: true)
+        guard isSignedInToiCloud else {
+            print("CloudKit: Cannot setup subscription - not signed in")
+            return
+        }
+        
+        print("CloudKit: Setting up subscription")
+        
         let subscription = CKQuerySubscription(
             recordType: "TodoItem",
-            predicate: predicate,
+            predicate: NSPredicate(format: "TRUEPREDICATE"),
             subscriptionID: subscriptionID,
             options: [.firesOnRecordCreation, .firesOnRecordUpdate, .firesOnRecordDeletion]
         )
@@ -74,85 +104,152 @@ class CloudKitManager: ObservableObject {
         notificationInfo.shouldSendContentAvailable = true
         subscription.notificationInfo = notificationInfo
         
-        database.save(subscription) { _, error in
+        database.save(subscription) { subscription, error in
             if let error = error {
-                print("Subscription error: \(error.localizedDescription)")
+                print("CloudKit: Failed to save subscription: \(error.localizedDescription)")
+            } else {
+                print("CloudKit: Subscription saved successfully")
             }
         }
     }
     
-    // Fetch TodoItems from CloudKit
-    func fetchTodos(completion: @escaping ([TodoItem]?, Error?) -> Void) {
-        let query = CKQuery(recordType: "TodoItem", predicate: NSPredicate(value: true))
+    // Fetch todos with better error handling
+    func fetchTodos(completion: @escaping ([TodoItem], Error?) -> Void) {
+        // Check if we're signed in first
+        if !isSignedInToiCloud {
+            print("CloudKit: Not signed in, skipping fetch")
+            completion([], nil)
+            return
+        }
         
         DispatchQueue.main.async {
             self.isSyncing = true
+            self.error = nil
         }
         
-        // Using the newer API
-        let queryOperation = CKQueryOperation(query: query)
-        var fetchedRecords = [CKRecord]()
+        print("CloudKit: Fetching todos from iCloud")
         
-        // Configure the query operation
-        queryOperation.recordMatchedBlock = { (recordID, result) in
-            switch result {
-            case .success(let record):
-                fetchedRecords.append(record)
-            case .failure(let error):
-                print("Error fetching record: \(error.localizedDescription)")
+        let query = CKQuery(recordType: "TodoItem", predicate: NSPredicate(format: "TRUEPREDICATE"))
+        query.sortDescriptors = [NSSortDescriptor(key: "modificationDate", ascending: false)]
+        
+        // Use the updated API for iOS 15+
+        if #available(iOS 15.0, *) {
+            database.fetch(withQuery: query, inZoneWith: nil, desiredKeys: nil, resultsLimit: CKQueryOperation.maximumResults) { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.isSyncing = false
+                    
+                    switch result {
+                    case .success(let (matchResults, _)):
+                        print("CloudKit: Query succeeded with \(matchResults.count) results")
+                        
+                        var todoItems: [TodoItem] = []
+                        for (_, recordResult) in matchResults {
+                            switch recordResult {
+                            case .success(let record):
+                                if let todoItem = TodoItem.fromCKRecord(record) {
+                                    todoItems.append(todoItem)
+                                } else {
+                                    print("CloudKit: Failed to convert record to TodoItem")
+                                }
+                            case .failure(let error):
+                                print("CloudKit: Error processing individual record: \(error.localizedDescription)")
+                            }
+                        }
+                        
+                        print("CloudKit: Successfully converted \(todoItems.count) records to TodoItems")
+                        completion(todoItems, nil)
+                        
+                    case .failure(let error):
+                        print("CloudKit: Error fetching records: \(error.localizedDescription)")
+                        self?.handleCloudKitError(error)
+                        completion([], error)
+                    }
+                }
             }
-        }
-        
-        queryOperation.queryResultBlock = { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isSyncing = false
-                
-                switch result {
-                case .success:
-                    let todoItems = fetchedRecords.compactMap { TodoItem.fromCKRecord($0) }
+        } else {
+            // Legacy API for iOS 14 and earlier
+            database.perform(query, inZoneWith: nil) { [weak self] (records, error) in
+                DispatchQueue.main.async {
+                    self?.isSyncing = false
+                    
+                    if let error = error {
+                        print("CloudKit: Error fetching records: \(error.localizedDescription)")
+                        self?.handleCloudKitError(error)
+                        completion([], error)
+                        return
+                    }
+                    
+                    guard let records = records else {
+                        print("CloudKit: No records found")
+                        completion([], nil)
+                        return
+                    }
+                    
+                    print("CloudKit: Found \(records.count) records")
+                    
+                    var todoItems: [TodoItem] = []
+                    for record in records {
+                        if let todoItem = TodoItem.fromCKRecord(record) {
+                            todoItems.append(todoItem)
+                        }
+                    }
+                    
+                    print("CloudKit: Successfully converted \(todoItems.count) records to TodoItems")
                     completion(todoItems, nil)
-                case .failure(let error):
-                    self?.error = "Failed to fetch todos: \(error.localizedDescription)"
-                    completion(nil, error)
                 }
             }
         }
-        
-        // Add the operation to the database
-        database.add(queryOperation)
     }
     
-    // Save a TodoItem to CloudKit
-    func saveTodo(_ todo: TodoItem, completion: @escaping (TodoItem?, Error?) -> Void) {
-        let record = todo.toCKRecord()
-        
-        DispatchQueue.main.async {
-            self.isSyncing = true
+    // Handle CloudKit errors gracefully
+    private func handleCloudKitError(_ error: Error) {
+        if let ckError = error as? CKError {
+            switch ckError.code {
+            case .notAuthenticated:
+                self.error = "Please sign in to iCloud"
+                self.isSignedInToiCloud = false
+            case .networkUnavailable, .networkFailure:
+                self.error = "Network unavailable - using local data"
+            case .quotaExceeded:
+                self.error = "iCloud storage full"
+            case .zoneBusy, .serviceUnavailable:
+                self.error = "iCloud service busy - will retry"
+            default:
+                self.error = "iCloud sync issue - using local data"
+            }
+        } else {
+            self.error = error.localizedDescription
         }
-        
-        database.save(record) { [weak self] record, error in
+    }
+    
+    // Sync with CloudKit with better error handling
+    func syncWithCloudKit(localTodos: [TodoItem], completion: @escaping ([TodoItem]) -> Void) {
+        fetchTodos { [weak self] cloudTodos, error in
             DispatchQueue.main.async {
-                self?.isSyncing = false
-                
                 if let error = error {
-                    self?.error = "Failed to save todo: \(error.localizedDescription)"
-                    completion(nil, error)
+                    print("CloudKit sync error: \(error.localizedDescription)")
+                    // Return local todos if there's an error - graceful fallback
+                    completion(localTodos)
                     return
                 }
                 
-                if let record = record, let todoItem = TodoItem.fromCKRecord(record) {
-                    completion(todoItem, nil)
+                // Perform sync logic (merge local and cloud)
+                if let strongSelf = self {
+                    let mergedTodos = strongSelf.mergeTodos(localTodos: localTodos, cloudTodos: cloudTodos)
+                    completion(mergedTodos)
                 } else {
-                    completion(nil, NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Failed to convert record"]))
+                    completion(localTodos)
                 }
             }
         }
     }
     
-    // Delete a TodoItem from CloudKit
-    func deleteTodo(_ todo: TodoItem, completion: @escaping (Bool, Error?) -> Void) {
-        guard let recordID = todo.recordID else {
-            completion(false, NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No record ID"]))
+    // Save a TodoItem to CloudKit with better error handling
+    func saveTodo(_ todo: TodoItem, completion: @escaping (TodoItem?, Error?) -> Void) {
+        guard isSignedInToiCloud else {
+            print("CloudKit: Cannot save - not signed in to iCloud")
+            let error = NSError(domain: "CloudKit", code: 1, userInfo: [NSLocalizedDescriptionKey: "Not signed in to iCloud"])
+            completion(nil, error)
             return
         }
         
@@ -160,37 +257,81 @@ class CloudKitManager: ObservableObject {
             self.isSyncing = true
         }
         
+        let record = todo.toCKRecord()
+        
+        print("CloudKit: Saving todo '\(todo.title)' with id \(todo.id.uuidString)")
+        
+        database.save(record) { [weak self] savedRecord, error in
+            DispatchQueue.main.async {
+                self?.isSyncing = false
+                
+                if let error = error {
+                    print("CloudKit: Error saving record: \(error.localizedDescription)")
+                    self?.handleCloudKitError(error)
+                    completion(nil, error)
+                    return
+                }
+                
+                if let savedRecord = savedRecord {
+                    print("CloudKit: Successfully saved record: \(savedRecord.recordID.recordName)")
+                    
+                    if let todoItem = TodoItem.fromCKRecord(savedRecord) {
+                        completion(todoItem, nil)
+                    } else {
+                        let error = NSError(domain: "CloudKit", code: 100, userInfo: [NSLocalizedDescriptionKey: "Failed to convert saved record"])
+                        completion(nil, error)
+                    }
+                } else {
+                    let error = NSError(domain: "CloudKit", code: 101, userInfo: [NSLocalizedDescriptionKey: "No record returned"])
+                    completion(nil, error)
+                }
+            }
+        }
+    }
+    
+    // Delete a TodoItem from CloudKit with better error handling
+    func deleteTodo(_ todo: TodoItem, completion: @escaping (Bool, Error?) -> Void) {
+        guard let recordID = todo.recordID else {
+            print("CloudKit: Cannot delete todo without recordID")
+            let error = NSError(domain: "CloudKit", code: 102, userInfo: [NSLocalizedDescriptionKey: "No record ID"])
+            completion(false, error)
+            return
+        }
+        
+        guard isSignedInToiCloud else {
+            print("CloudKit: Cannot delete - not signed in to iCloud")
+            let error = NSError(domain: "CloudKit", code: 1, userInfo: [NSLocalizedDescriptionKey: "Not signed in to iCloud"])
+            completion(false, error)
+            return
+        }
+        
+        DispatchQueue.main.async {
+            self.isSyncing = true
+        }
+        
+        print("CloudKit: Deleting todo with recordID: \(recordID.recordName)")
+        
         database.delete(withRecordID: recordID) { [weak self] (_, error) in
             DispatchQueue.main.async {
                 self?.isSyncing = false
                 
                 if let error = error {
-                    self?.error = "Failed to delete todo: \(error.localizedDescription)"
+                    print("CloudKit: Error deleting record: \(error.localizedDescription)")
+                    self?.handleCloudKitError(error)
                     completion(false, error)
                     return
                 }
                 
+                print("CloudKit: Successfully deleted record")
                 completion(true, nil)
-            }
-        }
-    }
-    
-    // Manually sync with CloudKit
-    func syncWithCloudKit(localTodos: [TodoItem], completion: @escaping ([TodoItem]) -> Void) {
-        fetchTodos { cloudTodos, error in
-            if let cloudTodos = cloudTodos {
-                // Perform sync logic (merge local and cloud)
-                let mergedTodos = self.mergeTodos(localTodos: localTodos, cloudTodos: cloudTodos)
-                completion(mergedTodos)
-            } else {
-                // If can't fetch, just return local todos
-                completion(localTodos)
             }
         }
     }
     
     // Merge local and cloud todos with conflict resolution
     private func mergeTodos(localTodos: [TodoItem], cloudTodos: [TodoItem]) -> [TodoItem] {
+        print("CloudKit: Merging \(localTodos.count) local todos with \(cloudTodos.count) cloud todos")
+        
         var mergedTodos = [TodoItem]()
         var localTodoDict = [UUID: TodoItem]()
         
@@ -202,13 +343,15 @@ class CloudKitManager: ObservableObject {
         // Process cloud todos first
         for cloudTodo in cloudTodos {
             if let localTodo = localTodoDict[cloudTodo.id] {
-                // Todo exists in both places - use newer version
-                if let cloudDate = cloudTodo.modificationDate, 
+                // Todo exists in both places - use newer version based on modification date
+                if let cloudDate = cloudTodo.modificationDate,
                    let localDate = localTodo.modificationDate,
                    cloudDate > localDate {
                     mergedTodos.append(cloudTodo)
+                    print("CloudKit: Using cloud version of '\(cloudTodo.title)' (newer)")
                 } else {
                     mergedTodos.append(localTodo)
+                    print("CloudKit: Using local version of '\(localTodo.title)' (newer or same)")
                 }
                 
                 // Remove from local dict to mark as processed
@@ -216,14 +359,17 @@ class CloudKitManager: ObservableObject {
             } else {
                 // Todo only exists in cloud, add it
                 mergedTodos.append(cloudTodo)
+                print("CloudKit: Adding cloud-only todo '\(cloudTodo.title)'")
             }
         }
         
-        // Add remaining local todos
+        // Add remaining local todos (they don't exist in cloud yet)
         for (_, localTodo) in localTodoDict {
             mergedTodos.append(localTodo)
+            print("CloudKit: Adding local-only todo '\(localTodo.title)'")
         }
         
+        print("CloudKit: Merge complete, resulting in \(mergedTodos.count) todos")
         return mergedTodos
     }
 }

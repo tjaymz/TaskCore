@@ -5,10 +5,10 @@
 //  Created by James Trujillo on 5/2/25.
 //
 
-
 import SwiftUI
 
 struct ContentView: View {
+    // Modified to use explicit initializer call
     @StateObject private var todoManager = TodoManager()
     @AppStorage("selectedMinutes") private var selectedMinutes = 5
     @AppStorage("maxNumber") private var maxNumber = 100
@@ -47,6 +47,10 @@ struct ContentView: View {
                 Label("Todos", systemImage: "checklist")
             }
         }
+//        .onAppear {
+//            // Perform initial iCloud check when app appears
+//            todoManager.retryiCloudConnection()
+//        }
     }
 }
 

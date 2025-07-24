@@ -5,16 +5,17 @@
 //  Created by James Trujillo on 5/2/25.
 //
 
-
-// TodoManager.swift
 import Foundation
 import CloudKit
 import SwiftUI
+import Combine
 
 class TodoManager: ObservableObject {
     @Published var todos: [TodoItem] = []
     @Published var selectedTodo: TodoItem?
-    @Published var syncStatus: String = "Up to date"
+    @Published var syncStatus: String = "Checking iCloud..."
+    @Published var cloudSyncEnabled: Bool = false
+    @Published var iCloudAvailable: Bool = false
     
     private let todosKey = "savedTodos"
     private let selectedTodoKey = "selectedTodo"
@@ -26,44 +27,39 @@ class TodoManager: ObservableObject {
         loadTodos()
         loadSelectedTodo()
         
-        // Initial sync with CloudKit
-        syncWithCloudKit()
+        // Check iCloud availability and auto-enable if available
+        checkiCloudAvailabilityAndAutoEnable()
         
         // Setup notification observer for CloudKit changes
         setupNotificationObserver()
     }
     
+    private func checkiCloudAvailabilityAndAutoEnable() {
+        // Removed CloudKit functionality
+    }
+    
     private func setupNotificationObserver() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleCloudKitNotification),
-            name: .NSPersistentStoreRemoteChange,
-            object: nil
-        )
+        // Removed CloudKit functionality
     }
     
     @objc private func handleCloudKitNotification(_ notification: Notification) {
-        DispatchQueue.main.async { [weak self] in
-            self?.syncWithCloudKit()
-        }
+        // Removed CloudKit functionality
+    }
+    
+    @objc private func handleiCloudAccountChange(_ notification: Notification) {
+        // Removed CloudKit functionality
+    }
+    
+    func enableCloudSync() {
+        // Removed CloudKit functionality
+    }
+    
+    func disableCloudSync() {
+        // Removed CloudKit functionality
     }
     
     func syncWithCloudKit() {
-        syncStatus = "Syncing..."
-        
-        cloudKitManager.syncWithCloudKit(localTodos: todos) { [weak self] mergedTodos in
-            DispatchQueue.main.async {
-                self?.todos = mergedTodos
-                self?.saveTodos()
-                self?.syncStatus = "Up to date"
-                
-                // Update selected todo if needed
-                if let selectedID = self?.selectedTodo?.id {
-                    self?.selectedTodo = mergedTodos.first(where: { $0.id == selectedID })
-                    self?.saveSelectedTodo()
-                }
-            }
-        }
+        // Removed CloudKit functionality
     }
     
     func loadTodos() {
@@ -108,18 +104,6 @@ class TodoManager: ObservableObject {
         let todo = TodoItem(title: title)
         todos.append(todo)
         saveTodos()
-        
-        // Save to CloudKit
-        cloudKitManager.saveTodo(todo) { [weak self] updatedTodo, error in
-            if let updatedTodo = updatedTodo {
-                DispatchQueue.main.async {
-                    if let index = self?.todos.firstIndex(where: { $0.id == todo.id }) {
-                        self?.todos[index] = updatedTodo
-                        self?.saveTodos()
-                    }
-                }
-            }
-        }
     }
     
     func deleteTodo(at offsets: IndexSet) {
@@ -132,12 +116,6 @@ class TodoManager: ObservableObject {
                     break
                 }
             }
-        }
-        
-        // Delete from CloudKit
-        for index in offsets {
-            let todo = todos[index]
-            cloudKitManager.deleteTodo(todo) { _, _ in }
         }
         
         todos.remove(atOffsets: offsets)
@@ -160,9 +138,6 @@ class TodoManager: ObservableObject {
             todos[index] = updatedTodo
             saveTodos()
             
-            // Update in CloudKit
-            cloudKitManager.saveTodo(updatedTodo) { _, _ in }
-            
             if selectedTodo?.id == todo.id {
                 selectedTodo = updatedTodo
                 saveSelectedTodo()
@@ -170,18 +145,5 @@ class TodoManager: ObservableObject {
         }
     }
     
-    // Check CloudKit sign-in status
-    var isiCloudSignedIn: Bool {
-        return cloudKitManager.isSignedInToiCloud
-    }
-    
-    // CloudKit error
-    var cloudKitError: String? {
-        return cloudKitManager.error
-    }
-    
-    // Force sync with CloudKit
-    func forceSyncWithCloudKit() {
-        syncWithCloudKit()
-    }
+    // Removed CloudKit-related properties and functions
 }

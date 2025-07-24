@@ -5,7 +5,6 @@
 //  Created by James Trujillo on 5/2/25.
 //
 
-
 import SwiftUI
 
 struct TodoListTabView: View {
@@ -41,34 +40,6 @@ struct TodoListTabView: View {
                         .padding(.horizontal, 10)
                         .background(Color.yellow.opacity(0.2))
                         .cornerRadius(8)
-                    }
-                    // CloudKit status
-                        if !todoManager.isiCloudSignedIn {
-                            HStack {
-                                Image(systemName: "exclamationmark.icloud")
-                                    .foregroundColor(.red)
-                                Text("Sign in to iCloud to enable sync")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                            }
-                            .padding(.vertical, 5)
-                        } else {
-                            HStack {
-                                Image(systemName: "checkmark.icloud")
-                                    .foregroundColor(.green)
-                                Text(todoManager.syncStatus)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(.vertical, 5)
-                        }
-                        
-                        if let error = todoManager.cloudKitError {
-                            Text(error)
-                                .font(.caption)
-                                .foregroundColor(.red)
-                                .padding(.vertical, 5)
-                        }
                     }
                 }
                 .padding()
@@ -129,14 +100,6 @@ struct TodoListTabView: View {
                 .disabled(todoManager.todos.isEmpty)
             }
             .navigationTitle("Todo List")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        todoManager.forceSyncWithCloudKit()
-                    }) {
-                        Image(systemName: "arrow.clockwise.icloud")
-                    }
-                }
         }
     }
     
