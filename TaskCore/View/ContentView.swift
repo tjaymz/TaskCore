@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ContentView: View {
-    // Modified to use explicit initializer call
     @StateObject private var todoManager = TodoManager()
     @AppStorage("selectedMinutes") private var selectedMinutes = 5
     @AppStorage("maxNumber") private var maxNumber = 100
@@ -46,11 +45,17 @@ struct ContentView: View {
             .tabItem {
                 Label("Todos", systemImage: "checklist")
             }
+            
+            // New Settings Tab
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
+                }
         }
-//        .onAppear {
-//            // Perform initial iCloud check when app appears
-//            todoManager.retryiCloudConnection()
-//        }
+        .onAppear {
+            // Initialize haptic manager on app launch
+            _ = HapticManager.shared
+        }
     }
 }
 

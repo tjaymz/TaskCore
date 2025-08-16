@@ -20,8 +20,17 @@ struct TodoListTabView: View {
                         TextField("New Todo", text: $newTodoTitle)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .font(.title3)
+                            .onSubmit {
+                                if !newTodoTitle.isEmpty {
+                                    HapticManager.shared.success()
+                                    addTodo()
+                                }
+                            }
                         
-                        Button(action: addTodo) {
+                        Button(action: {
+                            HapticManager.shared.success()
+                            addTodo()
+                        }) {
                             Image(systemName: "plus.circle.fill")
                                 .font(.title2)
                                 .foregroundColor(.blue)
@@ -49,10 +58,20 @@ struct TodoListTabView: View {
                 List {
                     ForEach(todoManager.todos) { todo in
                         HStack {
-                            Button(action: { toggleTodo(todo) }) {
+                            Button(action: {
+                                // Different haptic for complete vs uncomplete
+                                if todo.isCompleted {
+                                    HapticManager.shared.tap()
+                                } else {
+                                    HapticManager.shared.success()
+                                }
+                                toggleTodo(todo)
+                            }) {
                                 Image(systemName: todo.isCompleted ? "checkmark.circle.fill" : "circle")
                                     .foregroundColor(todo.isCompleted ? .green : .gray)
+                                    .font(.title2)
                             }
+                            .buttonStyle(PlainButtonStyle())
                             
                             Text(todo.title)
                                 .font(.title3)
@@ -70,6 +89,15 @@ struct TodoListTabView: View {
                         .padding(.vertical, 8)
                         .contentShape(Rectangle())
                         .onTapGesture {
+                            HapticManager.shared.selection()
+                            withAnimation {
+                                todoManager.selectedTodo = todo
+                                todoManager.saveSelectedTodo()
+                            }
+                        }
+                        .onLongPressGesture {
+                            // Heavy haptic for long press - could add context menu here later
+                            HapticManager.shared.impact(style: .heavy)
                             withAnimation {
                                 todoManager.selectedTodo = todo
                                 todoManager.saveSelectedTodo()
@@ -77,14 +105,19 @@ struct TodoListTabView: View {
                         }
                     }
                     .onDelete { offsets in
+                        HapticManager.shared.warning()
                         withAnimation {
                             todoManager.deleteTodo(at: offsets)
                         }
                     }
                 }
+                .listStyle(PlainListStyle())
                 
                 // Random Selection Button
-                Button(action: { todoManager.selectRandomTodo() }) {
+                Button(action: {
+                    HapticManager.shared.impact(style: .medium)
+                    todoManager.selectRandomTodo()
+                }) {
                     HStack {
                         Image(systemName: "shuffle")
                         Text("Pick Random Todo")

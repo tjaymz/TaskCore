@@ -7,7 +7,25 @@
 		<key>TaskCore.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>TaskFluxWidgetsExtension.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>992559EF2E4588D800F1FD65</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9976E4982DC59D0E00E05698</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

@@ -2,6 +2,14 @@
 //  TimerActivityAttributes.swift
 //  TaskCore
 //
+//  Created by James Trujillo on 8/7/25.
+//
+
+
+//
+//  TimerActivityAttributes.swift
+//  TaskCore
+//
 //  Created by James Trujillo on 5/2/25.
 //
 

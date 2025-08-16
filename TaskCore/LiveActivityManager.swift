@@ -2,6 +2,14 @@
 //  LiveActivityManager.swift
 //  TaskCore
 //
+//  Created by James Trujillo on 8/7/25.
+//
+
+
+//
+//  LiveActivityManager.swift
+//  TaskCore
+//
 //  Created by James Trujillo on 5/2/25.
 //
 

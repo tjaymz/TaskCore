@@ -17,8 +17,14 @@ class TodoManager: ObservableObject {
     @Published var cloudSyncEnabled: Bool = false
     @Published var iCloudAvailable: Bool = false
     
+    // Timer state management
+    @Published var timerEndDate: Date? = nil
+    @Published var timerDuration: Int = 0
+    
     private let todosKey = "savedTodos"
     private let selectedTodoKey = "selectedTodo"
+    private let timerEndDateKey = "timerEndDate"
+    private let timerDurationKey = "timerDuration"
     
     // CloudKit manager
     private let cloudKitManager = CloudKitManager()
@@ -26,17 +32,45 @@ class TodoManager: ObservableObject {
     init() {
         loadTodos()
         loadSelectedTodo()
-        
-        // Check iCloud availability and auto-enable if available
-        checkiCloudAvailabilityAndAutoEnable()
+        loadTimerState()
         
         // Setup notification observer for CloudKit changes
         setupNotificationObserver()
     }
     
-    private func checkiCloudAvailabilityAndAutoEnable() {
-        // Removed CloudKit functionality
+    // MARK: - Timer State Management
+    
+    func saveTimerState(endDate: Date?, duration: Int) {
+        timerEndDate = endDate
+        timerDuration = duration
+        
+        if let endDate = endDate {
+            UserDefaults.standard.set(endDate, forKey: timerEndDateKey)
+            UserDefaults.standard.set(duration, forKey: timerDurationKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: timerEndDateKey)
+            UserDefaults.standard.removeObject(forKey: timerDurationKey)
+        }
     }
+    
+    func loadTimerState() {
+        if let endDate = UserDefaults.standard.object(forKey: timerEndDateKey) as? Date {
+            timerEndDate = endDate
+            timerDuration = UserDefaults.standard.integer(forKey: timerDurationKey)
+        }
+    }
+    
+    func clearTimerState() {
+        saveTimerState(endDate: nil, duration: 0)
+    }
+    
+    func calculateRemainingTime() -> Int {
+        guard let endDate = timerEndDate else { return 0 }
+        let remaining = Int(endDate.timeIntervalSinceNow)
+        return max(0, remaining)
+    }
+    
+    // MARK: - Existing Todo Methods
     
     private func setupNotificationObserver() {
         // Removed CloudKit functionality
@@ -144,6 +178,4 @@ class TodoManager: ObservableObject {
             }
         }
     }
-    
-    // Removed CloudKit-related properties and functions
 }

@@ -1,3 +1,11 @@
+//
+//  HapticManager.swift
+//  TaskCore
+//
+//  Created by James Trujillo on 8/7/25.
+//
+
+
 import SwiftUI
 
 class HapticManager {

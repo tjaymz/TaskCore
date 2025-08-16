@@ -8,6 +8,18 @@
 import WidgetKit
 import SwiftUI
 
+// Main widget (if you want a home screen widget)
+struct TaskFluxWidgets: Widget {
+    let kind: String = "TaskFluxWidgets"
+
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+            TaskFluxWidgetsEntryView(entry: entry)
+                .containerBackground(.fill.tertiary, for: .widget)
+        }
+    }
+}
+
 struct Provider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
         SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
@@ -30,10 +42,6 @@ struct Provider: AppIntentTimelineProvider {
 
         return Timeline(entries: entries, policy: .atEnd)
     }
-
-//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
-//        // Generate a list containing the contexts this widget is relevant in.
-//    }
 }
 
 struct SimpleEntry: TimelineEntry {
@@ -46,43 +54,14 @@ struct TaskFluxWidgetsEntryView : View {
 
     var body: some View {
         VStack {
-            Text("Time:")
+            HStack {
+                Image(systemName: "timer")
+                    .foregroundColor(.blue)
+                Text("TaskCore")
+                    .font(.headline)
+            }
             Text(entry.date, style: .time)
-
-            Text("Favorite Emoji:")
-            Text(entry.configuration.favoriteEmoji)
+                .font(.caption)
         }
     }
-}
-
-struct TaskFluxWidgets: Widget {
-    let kind: String = "TaskFluxWidgets"
-
-    var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
-            TaskFluxWidgetsEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
-        }
-    }
-}
-
-extension ConfigurationAppIntent {
-    fileprivate static var smiley: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "😀"
-        return intent
-    }
-    
-    fileprivate static var starEyes: ConfigurationAppIntent {
-        let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "🤩"
-        return intent
-    }
-}
-
-#Preview(as: .systemSmall) {
-    TaskFluxWidgets()
-} timeline: {
-    SimpleEntry(date: .now, configuration: .smiley)
-    SimpleEntry(date: .now, configuration: .starEyes)
 }

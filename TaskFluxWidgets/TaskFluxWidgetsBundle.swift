@@ -13,6 +13,6 @@ struct TaskFluxWidgetsBundle: WidgetBundle {
     var body: some Widget {
         TaskFluxWidgets()
         TaskFluxWidgetsControl()
-        TaskFluxWidgetsLiveActivity()
+        TaskFluxWidgetsLiveActivity()  // This already exists in your TaskFluxWidgets.swift file!
     }
 }

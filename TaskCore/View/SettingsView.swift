@@ -2,6 +2,14 @@
 //  SettingsView.swift
 //  TaskCore
 //
+//  Created by James Trujillo on 8/7/25.
+//
+
+
+//
+//  SettingsView.swift
+//  TaskCore
+//
 //  Created by James Trujillo on 5/2/25.
 //
 
@@ -11,6 +19,7 @@ struct SettingsView: View {
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
     @AppStorage("soundEnabled") private var soundEnabled = true
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
+    @AppStorage("liveActivitiesEnabled") private var liveActivitiesEnabled = true
     
     var body: some View {
         NavigationStack {
@@ -138,6 +147,24 @@ struct SettingsView: View {
                     
                     Button("Share TaskCore") {
                         // Share sheet functionality would go here
+                    }
+                }
+                
+                Section("Live Activities") {
+                    Toggle("Enable Live Activities", isOn: $liveActivitiesEnabled)
+                        .onChange(of: liveActivitiesEnabled) { _, newValue in
+                            if newValue {
+                                HapticManager.shared.selection()
+                            } else {
+                                // End any active Live Activity if disabled
+                                LiveActivityManager.shared.endCurrentActivity()
+                            }
+                        }
+                    
+                    if liveActivitiesEnabled {
+                        Text("Shows timer countdown in Dynamic Island and on Lock Screen")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
             }
