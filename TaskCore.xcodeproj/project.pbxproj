@@ -24,18 +24,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		9976E4992DC59D0E00E05698 /* TaskCore.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TaskCore.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9976E4A62DC59D0F00E05698 /* TaskCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaskCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9976E4B02DC59D0F00E05698 /* TaskCoreUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaskCoreUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9976E4992DC59D0E00E05698 /* TaskFlux.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TaskFlux.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9976E4A62DC59D0F00E05698 /* TaskFluxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaskFluxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9976E4B02DC59D0F00E05698 /* TaskFluxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaskFluxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		9976E4DC2DCFFDB000E05698 /* Exceptions for "TaskCore" folder in "TaskCore" target */ = {
+		9976E4DC2DCFFDB000E05698 /* Exceptions for "TaskCore" folder in "TaskFlux" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 9976E4982DC59D0E00E05698 /* TaskCore */;
+			target = 9976E4982DC59D0E00E05698 /* TaskFlux */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -43,7 +43,7 @@
 		9976E49B2DC59D0E00E05698 /* TaskCore */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				9976E4DC2DCFFDB000E05698 /* Exceptions for "TaskCore" folder in "TaskCore" target */,
+				9976E4DC2DCFFDB000E05698 /* Exceptions for "TaskCore" folder in "TaskFlux" target */,
 			);
 			path = TaskCore;
 			sourceTree = "<group>";
@@ -98,9 +98,9 @@
 		9976E49A2DC59D0E00E05698 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9976E4992DC59D0E00E05698 /* TaskCore.app */,
-				9976E4A62DC59D0F00E05698 /* TaskCoreTests.xctest */,
-				9976E4B02DC59D0F00E05698 /* TaskCoreUITests.xctest */,
+				9976E4992DC59D0E00E05698 /* TaskFlux.app */,
+				9976E4A62DC59D0F00E05698 /* TaskFluxTests.xctest */,
+				9976E4B02DC59D0F00E05698 /* TaskFluxUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,9 +108,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9976E4982DC59D0E00E05698 /* TaskCore */ = {
+		9976E4982DC59D0E00E05698 /* TaskFlux */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9976E4BA2DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskCore" */;
+			buildConfigurationList = 9976E4BA2DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskFlux" */;
 			buildPhases = (
 				9976E4952DC59D0E00E05698 /* Sources */,
 				9976E4962DC59D0E00E05698 /* Frameworks */,
@@ -123,16 +123,16 @@
 			fileSystemSynchronizedGroups = (
 				9976E49B2DC59D0E00E05698 /* TaskCore */,
 			);
-			name = TaskCore;
+			name = TaskFlux;
 			packageProductDependencies = (
 			);
 			productName = TaskCore;
-			productReference = 9976E4992DC59D0E00E05698 /* TaskCore.app */;
+			productReference = 9976E4992DC59D0E00E05698 /* TaskFlux.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9976E4A52DC59D0F00E05698 /* TaskCoreTests */ = {
+		9976E4A52DC59D0F00E05698 /* TaskFluxTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9976E4BD2DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskCoreTests" */;
+			buildConfigurationList = 9976E4BD2DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskFluxTests" */;
 			buildPhases = (
 				9976E4A22DC59D0F00E05698 /* Sources */,
 				9976E4A32DC59D0F00E05698 /* Frameworks */,
@@ -146,16 +146,16 @@
 			fileSystemSynchronizedGroups = (
 				9976E4A92DC59D0F00E05698 /* TaskCoreTests */,
 			);
-			name = TaskCoreTests;
+			name = TaskFluxTests;
 			packageProductDependencies = (
 			);
 			productName = TaskCoreTests;
-			productReference = 9976E4A62DC59D0F00E05698 /* TaskCoreTests.xctest */;
+			productReference = 9976E4A62DC59D0F00E05698 /* TaskFluxTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		9976E4AF2DC59D0F00E05698 /* TaskCoreUITests */ = {
+		9976E4AF2DC59D0F00E05698 /* TaskFluxUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9976E4C02DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskCoreUITests" */;
+			buildConfigurationList = 9976E4C02DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskFluxUITests" */;
 			buildPhases = (
 				9976E4AC2DC59D0F00E05698 /* Sources */,
 				9976E4AD2DC59D0F00E05698 /* Frameworks */,
@@ -169,11 +169,11 @@
 			fileSystemSynchronizedGroups = (
 				9976E4B32DC59D0F00E05698 /* TaskCoreUITests */,
 			);
-			name = TaskCoreUITests;
+			name = TaskFluxUITests;
 			packageProductDependencies = (
 			);
 			productName = TaskCoreUITests;
-			productReference = 9976E4B02DC59D0F00E05698 /* TaskCoreUITests.xctest */;
+			productReference = 9976E4B02DC59D0F00E05698 /* TaskFluxUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -199,7 +199,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 9976E4942DC59D0E00E05698 /* Build configuration list for PBXProject "TaskCore" */;
+			buildConfigurationList = 9976E4942DC59D0E00E05698 /* Build configuration list for PBXProject "TaskFlux" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -213,9 +213,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				9976E4982DC59D0E00E05698 /* TaskCore */,
-				9976E4A52DC59D0F00E05698 /* TaskCoreTests */,
-				9976E4AF2DC59D0F00E05698 /* TaskCoreUITests */,
+				9976E4982DC59D0E00E05698 /* TaskFlux */,
+				9976E4A52DC59D0F00E05698 /* TaskFluxTests */,
+				9976E4AF2DC59D0F00E05698 /* TaskFluxUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -271,12 +271,12 @@
 /* Begin PBXTargetDependency section */
 		9976E4A82DC59D0F00E05698 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9976E4982DC59D0E00E05698 /* TaskCore */;
+			target = 9976E4982DC59D0E00E05698 /* TaskFlux */;
 			targetProxy = 9976E4A72DC59D0F00E05698 /* PBXContainerItemProxy */;
 		};
 		9976E4B22DC59D0F00E05698 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9976E4982DC59D0E00E05698 /* TaskCore */;
+			target = 9976E4982DC59D0E00E05698 /* TaskFlux */;
 			targetProxy = 9976E4B12DC59D0F00E05698 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -424,8 +424,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.2ndstartech.TaskCore;
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.2ndstartech.TaskFlux;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -454,8 +454,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.2ndstartech.TaskCore;
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.2ndstartech.TaskFlux;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -478,7 +478,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TaskCore.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TaskCore";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TaskFlux.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TaskFlux";
 			};
 			name = Debug;
 		};
@@ -497,7 +497,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TaskCore.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TaskCore";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TaskFlux.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TaskFlux";
 			};
 			name = Release;
 		};
@@ -538,7 +538,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9976E4942DC59D0E00E05698 /* Build configuration list for PBXProject "TaskCore" */ = {
+		9976E4942DC59D0E00E05698 /* Build configuration list for PBXProject "TaskFlux" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9976E4B82DC59D0F00E05698 /* Debug */,
@@ -547,7 +547,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9976E4BA2DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskCore" */ = {
+		9976E4BA2DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskFlux" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9976E4BB2DC59D0F00E05698 /* Debug */,
@@ -556,7 +556,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9976E4BD2DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskCoreTests" */ = {
+		9976E4BD2DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskFluxTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9976E4BE2DC59D0F00E05698 /* Debug */,
@@ -565,7 +565,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9976E4C02DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskCoreUITests" */ = {
+		9976E4C02DC59D0F00E05698 /* Build configuration list for PBXNativeTarget "TaskFluxUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9976E4C12DC59D0F00E05698 /* Debug */,
